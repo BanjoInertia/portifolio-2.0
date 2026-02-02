@@ -1,0 +1,26 @@
+[
+    {
+      "id": "01",
+      "titulo": "SISTEMA: INFOMON",
+      "status": "CONCLUÍDO",
+      "descricao": "UMA ENCICLOPÉDIA POKÉMON COMPLETA. O FOCO AQUI FOI CRIAR UMA LISTA QUE CARREGA RÁPIDO, BUSCANDO TODAS AS INFORMAÇÕES DIRETO DA API OFICIAL.",
+      "detalhes": "FEITO COM REACT E STYLED COMPONENTS. APRENDI MUITO SOBRE COMO LIDAR COM GRANDES QUANTIDADES DE DADOS.",
+      "link": "https://infomon-two.vercel.app"
+    },
+    {
+      "id": "02",
+      "titulo": "SISTEMA: STORE",
+      "status": "CONCLUÍDO",
+      "descricao": "ESTE É UM SIMULADOR DE E-COMMERCE. FOQUEI EM CRIAR UM VISUAL BONITO E UM CARRINHO DE COMPRAS QUE GUARDA OS PRODUTOS NO LOCAL STORAGE, PENSANDO EM COMO O USUÁRIO NAVEGA.",
+      "detalhes": "USEI REACT PARA CRIAR COMPONENTES QUE PODEM SER REUTILIZADOS EM QUALQUER LUGAR DO SITE.",
+      "link": "https://main--store-inertia.netlify.app"
+    },
+    {
+      "id": "03",
+      "titulo": "IA: KNOW YOUR FAN",
+      "status": "EM ANÁLISE",
+      "descricao": "UM PROJETO DE TESTE TÉCNICO QUE USA INTELIGÊNCIA ARTIFICIAL. O SISTEMA LÊ O DOCUMENTO DO USUÁRIO, VALIDA OS DADOS COM O GEMINI E BUSCA NOTÍCIAS PERSONALIZADAS SOBRE OS GOSTOS DELE.",
+      "detalhes": "INTEGRAÇÃO COM A IA DO GOOGLE (GEMINI) E TÉCNICAS DE BUSCA AUTOMÁTICA DE NOTÍCIAS NA WEB.",
+      "link": "https://know-your-fan-frontend.onrender.com"
+    }
+  ]
