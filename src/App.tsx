@@ -66,11 +66,12 @@ export default function App() {
           style={{ 
             color: 'white', 
             fontFamily: 'sans-serif',
+            fontSize: 65,
             opacity: showText ? 1 : 0,
             transition: 'opacity 1s ease-in-out'
           }}
         >
-          Mensagem Humilde
+          Bem-vindo ao Portfólio
         </h1>
       </div>
     </div>

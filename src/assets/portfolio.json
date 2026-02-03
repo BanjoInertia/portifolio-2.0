@@ -20,7 +20,15 @@
       "titulo": "IA: KNOW YOUR FAN",
       "status": "EM ANÁLISE",
       "descricao": "UM PROJETO DE TESTE TÉCNICO QUE USA INTELIGÊNCIA ARTIFICIAL. O SISTEMA LÊ O DOCUMENTO DO USUÁRIO, VALIDA OS DADOS COM O GEMINI E BUSCA NOTÍCIAS PERSONALIZADAS SOBRE OS GOSTOS DELE.",
-      "detalhes": "INTEGRAÇÃO COM A IA DO GOOGLE (GEMINI) E TÉCNICAS DE BUSCA AUTOMÁTICA DE NOTÍCIAS NA WEB.",
+      "detalhes": "INTEGRAÇÃO COM A IA DO GOOGLE (GEMINI) E DESENVOLVIMENTO DE SCRAPERS PARA EXTRAÇÃO DE DADOS PÚBLICOS NA WEB.",
       "link": "https://know-your-fan-frontend.onrender.com"
+    },
+    {
+      "id": "04",
+      "titulo": "SISTEMA: PROJETO REACT NATIVE",
+      "status": "DESENVOLVENDO",
+      "descricao": "UM NOVO PROJETO ESTÁ SENDO CONSTRUÍDO AQUI. EM BREVE TEREMOS MAIS UMA FERRAMENTA PARA APRESENTAR.",
+      "detalhes": "REACT NATIVE, ???.",
+      "link": "#"
     }
   ]

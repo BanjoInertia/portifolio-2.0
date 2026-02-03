@@ -67,25 +67,25 @@ export function CenaCabine() {
   const livro2CapaRef = useRef<THREE.Group>(null)
   const fita1Ref = useRef<THREE.Group>(null)
   const fita2Ref = useRef<THREE.Group>(null)
-  const artefatoRef = useRef<THREE.Group>(null)
   const medidor1Ref = useRef<THREE.Mesh>(null)
   const medidor2Ref = useRef<THREE.Mesh>(null)
-  const globoRef = useRef<THREE.Group>(null)
   const alavanca1Ref = useRef<THREE.Group>(null)
   const alavanca2Ref = useRef<THREE.Group>(null)
   const setaDirRef = useRef<THREE.Group>(null)
   const setaEsqRef = useRef<THREE.Group>(null)
   const telaPrincipalRef = useRef<THREE.Mesh>(null)
+  const globoRef = useRef<THREE.Group>(null)
+  const artefatoRef = useRef<THREE.Group>(null)
 
   const testeRef = useRef<THREE.Mesh>(null)
 
   const [livro1Aberto, setLivro1Aberto] = useState(false)
   const [livro2Aberto, setLivro2Aberto] = useState(false)
-  const [globoGirando, setGloboGirando] = useState(false)
   const [alavanca1Ativa, setAlavanca1Ativa] = useState(false)
   const [alavanca2Ativa, setAlavanca2Ativa] = useState(false)
   const [setaDirAtiva, setSetaDirAtiva] = useState(false)
   const [setaEsqAtiva, setSetaEsqAtiva] = useState(false)
+  const [globoGirando, setGloboGirando] = useState(false)
 
   const [showModal, setShowModal] = useState(false)
   const [btnHovered, setBtnHovered] = useState(false)
@@ -93,12 +93,12 @@ export function CenaCabine() {
 
   const [pagina, setPagina] = useState(0)
 
-  useCursor(hovered)
-
-  const totalPaginas = portfolioData.length + 1
+  const totalPaginas = portfolioData.length + 2
 
   const proximaPagina = () => setPagina((prev) => (prev + 1) % totalPaginas)
   const paginaAnterior = () => setPagina((prev) => (prev - 1 + totalPaginas) % totalPaginas)
+
+  useCursor(hovered)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -120,19 +120,13 @@ export function CenaCabine() {
     state.camera.position.z = 45
     state.camera.lookAt(0, 5, 0)
 
+    {/* ================= ANIMAÇÃO LIVRO 1 ================= */}
     if (livro1Ref.current) {
       const target = livro1Aberto ? 3 : 0
       easing.dampE(livro1Ref.current.rotation, [0, 0, target], 0.25, delta)
     }
 
-    if (fita1Ref.current) {
-      easing.dampE(fita1Ref.current.rotation, [0, 0, fitaTarget], 0.2, delta)
-    }
-
-    if (fita2Ref.current) {
-      easing.dampE(fita2Ref.current.rotation, [0, 0, fitaFilhaTarget], 0.3, delta)
-    }
-
+    {/* ================= ANIMAÇÃO LIVRO 2 ================= */}
     if (livro2CapaRef.current) {
       const podeAbrirCapa = Math.abs(fita1Ref.current?.rotation.z || 0) > 0.4
       const currentTargetCapa = livro2Aberto ? (podeAbrirCapa ? capaTarget : 0) : 0
@@ -140,11 +134,21 @@ export function CenaCabine() {
       easing.dampE(livro2CapaRef.current.rotation, [0, 0, currentTargetCapa], 0.25, delta)
     }
 
+    if (fita1Ref.current) {
+      easing.dampE(fita1Ref.current.rotation, [0, 0, fitaTarget], 0.2, delta)
+    }
+    
+    if (fita2Ref.current) {
+      easing.dampE(fita2Ref.current.rotation, [0, 0, fitaFilhaTarget], 0.3, delta)
+    }
+
+    {/* ================= ANIMAÇÃO ARTEFATO ================= */}
     if (artefatoRef.current) {
       const oscilacao = Math.sin(t * 2) * 1.2;
       artefatoRef.current.rotation.z = oscilacao;
     }
 
+    {/* ================= ANIMAÇÃO MEDIDORES ================= */}
     if (medidor1Ref.current) {
       const tremor1 = Math.sin(t * 2) * 1 + (Math.random() * 0.02)
       medidor1Ref.current.rotation.z = tremor1
@@ -155,10 +159,7 @@ export function CenaCabine() {
       medidor2Ref.current.rotation.z = tremor2
     }
 
-    if (globoRef.current && globoGirando) {
-      globoRef.current.rotation.y += delta * 2.0;
-    }
-
+    {/* ================= ANIMAÇÃO ALAVANCAS ================= */}
     if (alavanca1Ref.current) {
       const target1 = alavanca1Ativa ? 0.4 : 0;
       easing.dampE(alavanca1Ref.current.rotation, [target1, 0, 0], 0.2, delta);
@@ -169,13 +170,12 @@ export function CenaCabine() {
       easing.dampE(alavanca2Ref.current.rotation, [target2, 0, 0], 0.2, delta);
     }
 
-    if (testeRef.current) {
-      testeRef.current.position.x = -0.122 + Math.sin(t * 0.7) * 0.03
-      testeRef.current.position.y = 6.137 + Math.cos(t * 0.6) * 0.02
-
-      testeRef.current.rotation.z = Math.sin(t * 0.2) * 0.005
+    {/* ================= ANIMAÇÃO GLOBO ================= */}
+    if (globoRef.current && globoGirando) {
+      globoRef.current.rotation.y += delta * 2.0;
     }
 
+    {/* ================= ANIMAÇÃO SETAS ================= */}
     if (setaDirRef.current) {
       const press = setaDirAtiva ? -0.15 : 0
       easing.damp3(setaDirRef.current.position, [0, 0, press], 0.1, delta)
@@ -186,6 +186,7 @@ export function CenaCabine() {
       easing.damp3(setaEsqRef.current.position, [0, 0, press], 0.1, delta)
     }
 
+    {/* ================= ANIMAÇÃO TELA PRINCIPAL ================= */}
     if (telaPrincipalRef.current) {
       const material = telaPrincipalRef.current.material as THREE.MeshStandardMaterial
 
@@ -194,6 +195,13 @@ export function CenaCabine() {
 
       easing.damp(material, 'emissiveIntensity', targetIntensity, 0.5, delta)
       easing.dampC(material.emissive, targetColor, 0.5, delta)
+    }
+
+    {/* ================= ANIMAÇÃO BACKGROUND ================= */}
+    if (testeRef.current) {
+      testeRef.current.position.x = -0.122 + Math.sin(t * 0.7) * 0.03
+      testeRef.current.position.y = 6.137 + Math.cos(t * 0.6) * 0.0
+      testeRef.current.rotation.z = Math.sin(t * 0.2) * 0.005
     }
   })
 
@@ -210,6 +218,7 @@ export function CenaCabine() {
       <group dispose={null}>
 
         {/* ================= MODAL CENTRAL ================= */}
+
         <group position={[0, 6.5, -2]}>
           <Html center distanceFactor={12}>
             <div style={{
@@ -219,7 +228,7 @@ export function CenaCabine() {
               transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
               pointerEvents: showModal ? 'all' : 'none'
             }}>
-              {pagina === 0 ? (
+              {pagina === 0 && (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#00ffa3', marginBottom: '10px' }}>
                     <span>SISTEMA: ONLINE</span>
@@ -259,24 +268,24 @@ export function CenaCabine() {
                     ACESSAR_GITHUB
                   </a>
                 </>
-              ) : (
+              )}
+              {pagina === 1 && (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#00ffa3', marginBottom: '10px' }}>
-                    <span>ID_{portfolioData[pagina - 1].id}</span>
-                    <span>STATUS: {portfolioData[pagina - 1].status}</span>
+                    <span>ARQUIVO: BIO_USER</span>
+                    <span>STATUS: AUTHENTICATED</span>
                   </div>
 
-                  <h2 style={titleStyle}>{portfolioData[pagina - 1].titulo}</h2>
+                  <h2 style={titleStyle}>SOBRE MIM</h2>
                   <div style={dividerStyle} />
 
-                  <p style={descStyle}>{portfolioData[pagina - 1].descricao}</p>
-
-                  <div style={{ fontSize: '11px', color: '#00aaff', marginTop: '10px', textAlign: 'left', marginBottom: '20px' }}>
-                    {portfolioData[pagina - 1].detalhes}
-                  </div>
+                  <p style={descStyle}>
+                    Desenvolvedor Front focado em criar interfaces imersivas e performantes.
+                    Misturo design e código para transformar ideias em experiências digitais únicas.
+                  </p>
 
                   <a
-                    href={portfolioData[pagina - 1].link}
+                    href="https://github.com/BanjoInertia"
                     target="_blank"
                     rel="noreferrer"
                     onMouseEnter={() => setBtnHovered(true)}
@@ -287,8 +296,57 @@ export function CenaCabine() {
                       color: btnHovered ? '#001414' : '#00ffa3',
                     }}
                   >
-                    ABRIR_PROJETO
+                    VER_REPOSITORIOS
                   </a>
+                </>
+              )}
+              {pagina >= 2 && (
+                <>
+                  {(() => {
+                    const projetoAtual = portfolioData[pagina - 2];
+                    const isDeveloping = projetoAtual?.status === "DESENVOLVENDO";
+                    const statusColor = isDeveloping ? '#ffcc00' : '#00ffa3';
+                    const statusShadow = isDeveloping ? '0 0 10px rgba(255, 204, 0, 0.5)' : '0 0 10px rgba(0, 255, 163, 0.5)';
+
+                    return (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: statusColor, marginBottom: '10px' }}>
+                          <span>ID_{projetoAtual?.id}</span>
+                          <span style={{ fontWeight: 'bold' }}>STATUS: {projetoAtual?.status}</span>
+                        </div>
+
+                        <h2 style={{ ...titleStyle, color: statusColor, textShadow: statusShadow }}>
+                          {projetoAtual?.titulo}
+                        </h2>
+
+                        <div style={{ ...dividerStyle, background: `linear-gradient(90deg, ${statusColor}, transparent)` }} />
+
+                        <p style={descStyle}>{projetoAtual?.descricao}</p>
+
+                        <div style={{ fontSize: '11px', color: isDeveloping ? '#ffaa00' : '#00aaff', marginTop: '10px', textAlign: 'left', marginBottom: '20px' }}>
+                          {projetoAtual?.detalhes}
+                        </div>
+
+                        <a
+                          href={isDeveloping ? undefined : projetoAtual?.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            ...actionButtonStyle,
+                            borderColor: statusColor,
+                            color: isDeveloping ? '#555' : (btnHovered ? '#001414' : statusColor),
+                            background: !isDeveloping && btnHovered ? statusColor : 'transparent',
+                            cursor: isDeveloping ? 'not-allowed' : 'pointer',
+                            opacity: isDeveloping ? 0.5 : 1,
+                            textDecoration: 'none'
+                          }}
+                          onClick={(e) => isDeveloping && e.preventDefault()}
+                        >
+                          {isDeveloping ? "ACESSO_RESTRITO" : "ABRIR_PROJETO"}
+                        </a>
+                      </>
+                    );
+                  })()}
                 </>
               )}
 
@@ -297,6 +355,7 @@ export function CenaCabine() {
           </Html>
         </group>
 
+        {/* ================= BACKGROUND ================= */}
 
         {nodes.teste && (
           <mesh
@@ -315,13 +374,14 @@ export function CenaCabine() {
             />
           </mesh>
         )}
+
         {/* ================= LIVRO 1 ================= */}
+
         <group
           position={[-5.841, 2.311, 2.844]}
           rotation={[0.5, 0.762, -0.224]}
           scale={0.708}
         >
-
           <primitive
             object={nodes.Empty_Livro1_Pivo}
             ref={livro1Ref}
@@ -361,7 +421,6 @@ export function CenaCabine() {
         </group>
 
         <group position={[6.452, 1.652, 3.788]} rotation={[0.466, -0.729, 0.194]} scale={0.638}>
-
           <primitive
             object={nodes.Empty_livro_2_fita_1_Pivo}
             ref={fita1Ref}
@@ -384,6 +443,7 @@ export function CenaCabine() {
         </group>
 
         {/* ================= ARTEFATO ================= */}
+
         <group
           position={[4.098, 3.75, -1.284]}
           rotation={[-0.024, -0.56, -0.885]}
@@ -408,6 +468,7 @@ export function CenaCabine() {
         </group>
 
         {/* ================= ALAVANCA 1 (Esquerda) ================= */}
+
         <group position={[-4.17, 2.582, 0.483]} rotation={[0.343, 0.637, -0.07]}>
           {nodes.Empty_alavanca_1 && (
             <primitive
@@ -426,6 +487,7 @@ export function CenaCabine() {
         </group>
 
         {/* ================= ALAVANCA 2 (Direita) ================= */}
+
         <group position={[-3.559, 2.683, 0.039]} rotation={[0.343, 0.637, -0.07]}>
           {nodes.Empty_alavanca_2 && (
             <primitive
@@ -444,6 +506,7 @@ export function CenaCabine() {
         </group>
 
         {/* ================= SETA DIREITA ================= */}
+
         <group
           position={[2.2, 2.992, -0.32]}
           rotation={[-0.671, -0.171, -0.153]}
@@ -494,6 +557,7 @@ export function CenaCabine() {
         </group>
 
         {/* ================= MEDIDOR 1 ================= */}
+
         <group position={[-4.514, 4.034, -1.34]} rotation={[-0.108, 0.656, -0.5]}>
           <primitive
             object={nodes.Empty_medidor_1_Pivo || new THREE.Group()}
@@ -513,6 +577,7 @@ export function CenaCabine() {
         </group>
 
         {/* ================= MEDIDOR 2 ================= */}
+
         <group position={[-6.055, 3.803, -0.044]} rotation={[-0.112, 0.695, -0.5]}>
           <primitive
             object={nodes.Empty_medidor_2_Pivo || new THREE.Group()}
@@ -530,25 +595,8 @@ export function CenaCabine() {
           </primitive>
         </group>
 
-        <group position={[-5.386, 2.526, 2.479]} rotation={[1.915, -0.161, -0.775]} scale={0.708}>
-          <mesh geometry={(nodes.livro_1_1 as THREE.Mesh).geometry} material={materials.cobre} />
-          <mesh geometry={(nodes.livro_1_2 as THREE.Mesh).geometry} material={materials['cobre.001']} />
-          <mesh geometry={(nodes.livro_1_3 as THREE.Mesh).geometry} material={materials.bege} />
-          <mesh geometry={(nodes.livro_1_4 as THREE.Mesh).geometry} material={materials.amarelo} />
-        </group>
-        <group position={[5.961, 2.111, 3.521]} rotation={[0.466, -0.729, 0.194]} scale={0.148}>
-          <mesh geometry={(nodes.livro_2_1 as THREE.Mesh).geometry} material={materials.cobre} />
-          <mesh geometry={(nodes.livro_2_2 as THREE.Mesh).geometry} material={materials['cobre.001']} />
-          <mesh geometry={(nodes.livro_2_3 as THREE.Mesh).geometry} material={materials.bege} />
-          <mesh geometry={(nodes.livro_2_4 as THREE.Mesh).geometry} material={materials.amarelo} />
-        </group>
+        {/* ================= GLOBO ================= */}
 
-        <group position={[4.098, 3.75, -1.284]} rotation={[1.622, -0.119, 0.564]} scale={[0.522, 0.058, 0.522]}>
-          <mesh geometry={(nodes.artefato_dourado_1 as THREE.Mesh).geometry} material={materials.ouro} />
-          <mesh geometry={(nodes.artefato_dourado_2 as THREE.Mesh).geometry} material={materials.madeira} />
-        </group>
-
-        {/* ================= GLOBO (Esfera com Pivô) ================= */}
         <group
           position={[5.417, 3.675, 1.223]}
           rotation={[0.244, 0.205, -0.311]}
@@ -573,11 +621,8 @@ export function CenaCabine() {
 
         <mesh geometry={(nodes.globo_estrutura002 as THREE.Mesh).geometry} material={materials['cobre.001']} position={[5.534, 2.937, 1.011]} rotation={[0.244, 0.205, 0.128]} scale={[0.072, 0.087, 0.072]} />
 
-        <mesh geometry={(nodes.esfera_vermelha as THREE.Mesh).geometry} material={materials.vermelho} position={[3.317, 2.319, 0.869]} rotation={[0.384, -0.445, 0.086]} scale={0.455} />
+        {/* ================= TELA PRINCIPAL ================= */}
 
-        <mesh geometry={(nodes.telinha as THREE.Mesh).geometry} position={[-5.244, 3.176, -0.927]} rotation={[0.139, -0.856, 0.208]} scale={[0.195, 0.195, 0.332]}>
-          <meshStandardMaterial color="#00ffa3" emissive="#00ffa3" emissiveIntensity={3} toneMapped={false} />
-        </mesh>
         <mesh
           ref={telaPrincipalRef}
           geometry={(nodes.tela_principal as THREE.Mesh).geometry}
@@ -592,6 +637,8 @@ export function CenaCabine() {
           />
         </mesh>
 
+        {/* ================= LUZES ================= */}
+
         <BlinkingLight node={nodes.luz as THREE.Mesh} color="#ff0000" speed={2.5} offset={0} />
         <BlinkingLight node={nodes.luz001 as THREE.Mesh} color="#0000ff" speed={5} offset={15} />
         <BlinkingLight node={nodes.luz002 as THREE.Mesh} color="#00ff00" speed={3} offset={5} />
@@ -601,6 +648,8 @@ export function CenaCabine() {
         <BlinkingLight node={nodes.luz006 as THREE.Mesh} color="#ffff00" speed={3} offset={5} />
         <BlinkingLight node={nodes.luz007 as THREE.Mesh} color="#ffff00" speed={4} offset={1} />
         <BlinkingLight node={nodes.luz008 as THREE.Mesh} color="#ff0000" speed={2} offset={10} />
+
+        {/* ================= RESTO DA CENA ================= */}
 
         <group position={[-6.249, 3.891, -0.252]} rotation={[1.882, 0.465, -0.789]} scale={0.679}>
           <mesh geometry={(nodes.cena_1 as THREE.Mesh).geometry} material={materials.metal} />
@@ -615,6 +664,12 @@ export function CenaCabine() {
           <mesh geometry={(nodes.cena_10 as THREE.Mesh).geometry} material={materials.metal_2} />
           <mesh geometry={(nodes.cena_11 as THREE.Mesh).geometry} material={materials.cabo_2} />
         </group>
+
+        <mesh geometry={(nodes.telinha as THREE.Mesh).geometry} position={[-5.244, 3.176, -0.927]} rotation={[0.139, -0.856, 0.208]} scale={[0.195, 0.195, 0.332]}>
+          <meshStandardMaterial color="#00ffa3" emissive="#00ffa3" emissiveIntensity={3} toneMapped={false} />
+        </mesh>
+
+        <mesh geometry={(nodes.esfera_vermelha as THREE.Mesh).geometry} material={materials.vermelho} position={[3.317, 2.319, 0.869]} rotation={[0.384, -0.445, 0.086]} scale={0.455} />
 
         <mesh geometry={(nodes.mesh as THREE.Mesh).geometry} material={materials.preto} />
 
