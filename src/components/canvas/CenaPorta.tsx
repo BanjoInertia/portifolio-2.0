@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { useRef, useState, forwardRef } from 'react'
-import { useGLTF, useCursor } from '@react-three/drei'
+import { useGLTF, useCursor, Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { easing } from 'maath'
 import type { GLTF } from 'three-stdlib'
@@ -74,6 +74,37 @@ const CenárioBase = ({ nodes, materials }: {
   </>
 )
 
+const panelStyle: React.CSSProperties = {
+  background: 'rgba(0, 20, 20, 0.7)',
+  backdropFilter: 'blur(4px)',
+  color: '#e0ffff',
+  padding: '25px',
+  borderRadius: '2px',
+  width: '380px',
+  border: '1px solid rgba(0, 255, 163, 0.3)',
+  boxShadow: '0 0 20px rgba(0, 255, 163, 0.1), inset 0 0 15px rgba(0, 255, 163, 0.1)',
+  fontFamily: '"Courier New", Courier, monospace',
+  position: 'relative',
+  textTransform: 'uppercase'
+}
+
+const descStyle: React.CSSProperties = {
+  fontSize: '13px',
+  lineHeight: '1.6',
+  textAlign: 'justify',
+  color: '#aaffff'
+}
+
+const cornerStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '-5px',
+  right: '-5px',
+  width: '20px',
+  height: '20px',
+  borderTop: '3px solid #00ffa3',
+  borderRight: '3px solid #00ffa3'
+}
+
 export function CenaPorta({ onEnter }: { onEnter: (s: boolean) => void }) {
   const { nodes, materials } = useGLTF('/models/porta.glb') as unknown as GLTFResult
   const doorGroupRef = useRef<THREE.Group>(null)
@@ -120,6 +151,70 @@ export function CenaPorta({ onEnter }: { onEnter: (s: boolean) => void }) {
 
   return (
     <group dispose={null}>
+
+      {/* ================= AVISO DE PERFORMANCE ================= */}
+      <Html fullscreen>
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          pointerEvents: 'none',
+        }}>
+          <div style={{
+            ...panelStyle,
+            position: 'absolute',
+            bottom: '600px',
+            right: '50px',
+            width: '440px',
+            padding: '30px',
+            fontSize: '14px',
+
+            color: '#ffcc00',
+            border: '2px solid #ffcc00',
+            background: 'rgba(0, 10, 10, 0.95)',
+            pointerEvents: 'all',
+            zIndex: 9999
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: '10px',
+              fontSize: '16px',
+              fontWeight: 'bold'
+            }}>
+              <span>SISTEMA</span>
+              <span>ALERTA_CRÍTICO</span>
+            </div>
+
+            <div style={{ height: '3px', background: '#ffcc00', margin: '15px 0' }} />
+
+            <p style={{
+              ...descStyle,
+              color: '#ffcc00',
+              textAlign: 'left',
+              margin: 0,
+              fontSize: '13px',
+              lineHeight: '1.8'
+            }}>
+              ESTE PROJETO UTILIZA RENDERIZAÇÃO 3D PESADA.
+              PARA EVITAR TRAVAMENTOS E GARANTIR A FLUIDEZ, ATIVE A
+              <strong style={{ color: '#fff' }}> ACELERAÇÃO DE HARDWARE </strong>
+              NAS CONFIGURAÇÕES DO SEU NAVEGADOR.
+            </p>
+
+            <div style={{
+              ...cornerStyle,
+              width: '30px',
+              height: '30px',
+              borderTop: '4px solid #ffcc00',
+              borderRight: '4px solid #ffcc00'
+            }} />
+          </div>
+        </div>
+      </Html>
+
       <Porta
         ref={doorGroupRef}
         nodes={nodes}

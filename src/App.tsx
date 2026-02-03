@@ -10,7 +10,7 @@ export default function App() {
 
   useEffect(() => {
     if (fadeToBlack && currentScene === 'porta') {
-      
+
       const timerTexto = setTimeout(() => {
         setShowText(true)
       }, 1500)
@@ -34,7 +34,7 @@ export default function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', backgroundColor: '#101010' }}>
-      
+
       <Canvas shadows camera={{ position: [0, 5, 50], fov: 10 }}>
         <ambientLight intensity={0.05} />
 
@@ -62,9 +62,9 @@ export default function App() {
           justifyContent: 'center'
         }}
       >
-        <h1 
-          style={{ 
-            color: 'white', 
+        <h1
+          style={{
+            color: 'white',
             fontFamily: 'sans-serif',
             fontSize: 65,
             opacity: showText ? 1 : 0,

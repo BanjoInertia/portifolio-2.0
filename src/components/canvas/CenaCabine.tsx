@@ -108,7 +108,6 @@ export function CenaCabine() {
     return () => clearTimeout(timer);
   }, []);
 
-  // --- ANIMAÇÃO ---
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime
     const fitaTarget = livro2Aberto ? -1.6 : 0
@@ -120,13 +119,13 @@ export function CenaCabine() {
     state.camera.position.z = 45
     state.camera.lookAt(0, 5, 0)
 
-    {/* ================= ANIMAÇÃO LIVRO 1 ================= */}
+    {/* ================= ANIMAÇÃO LIVRO 1 ================= */ }
     if (livro1Ref.current) {
       const target = livro1Aberto ? 3 : 0
       easing.dampE(livro1Ref.current.rotation, [0, 0, target], 0.25, delta)
     }
 
-    {/* ================= ANIMAÇÃO LIVRO 2 ================= */}
+    {/* ================= ANIMAÇÃO LIVRO 2 ================= */ }
     if (livro2CapaRef.current) {
       const podeAbrirCapa = Math.abs(fita1Ref.current?.rotation.z || 0) > 0.4
       const currentTargetCapa = livro2Aberto ? (podeAbrirCapa ? capaTarget : 0) : 0
@@ -137,18 +136,18 @@ export function CenaCabine() {
     if (fita1Ref.current) {
       easing.dampE(fita1Ref.current.rotation, [0, 0, fitaTarget], 0.2, delta)
     }
-    
+
     if (fita2Ref.current) {
       easing.dampE(fita2Ref.current.rotation, [0, 0, fitaFilhaTarget], 0.3, delta)
     }
 
-    {/* ================= ANIMAÇÃO ARTEFATO ================= */}
+    {/* ================= ANIMAÇÃO ARTEFATO ================= */ }
     if (artefatoRef.current) {
       const oscilacao = Math.sin(t * 2) * 1.2;
       artefatoRef.current.rotation.z = oscilacao;
     }
 
-    {/* ================= ANIMAÇÃO MEDIDORES ================= */}
+    {/* ================= ANIMAÇÃO MEDIDORES ================= */ }
     if (medidor1Ref.current) {
       const tremor1 = Math.sin(t * 2) * 1 + (Math.random() * 0.02)
       medidor1Ref.current.rotation.z = tremor1
@@ -159,7 +158,7 @@ export function CenaCabine() {
       medidor2Ref.current.rotation.z = tremor2
     }
 
-    {/* ================= ANIMAÇÃO ALAVANCAS ================= */}
+    {/* ================= ANIMAÇÃO ALAVANCAS ================= */ }
     if (alavanca1Ref.current) {
       const target1 = alavanca1Ativa ? 0.4 : 0;
       easing.dampE(alavanca1Ref.current.rotation, [target1, 0, 0], 0.2, delta);
@@ -170,12 +169,12 @@ export function CenaCabine() {
       easing.dampE(alavanca2Ref.current.rotation, [target2, 0, 0], 0.2, delta);
     }
 
-    {/* ================= ANIMAÇÃO GLOBO ================= */}
+    {/* ================= ANIMAÇÃO GLOBO ================= */ }
     if (globoRef.current && globoGirando) {
       globoRef.current.rotation.y += delta * 2.0;
     }
 
-    {/* ================= ANIMAÇÃO SETAS ================= */}
+    {/* ================= ANIMAÇÃO SETAS ================= */ }
     if (setaDirRef.current) {
       const press = setaDirAtiva ? -0.15 : 0
       easing.damp3(setaDirRef.current.position, [0, 0, press], 0.1, delta)
@@ -186,7 +185,7 @@ export function CenaCabine() {
       easing.damp3(setaEsqRef.current.position, [0, 0, press], 0.1, delta)
     }
 
-    {/* ================= ANIMAÇÃO TELA PRINCIPAL ================= */}
+    {/* ================= ANIMAÇÃO TELA PRINCIPAL ================= */ }
     if (telaPrincipalRef.current) {
       const material = telaPrincipalRef.current.material as THREE.MeshStandardMaterial
 
@@ -197,7 +196,7 @@ export function CenaCabine() {
       easing.dampC(material.emissive, targetColor, 0.5, delta)
     }
 
-    {/* ================= ANIMAÇÃO BACKGROUND ================= */}
+    {/* ================= ANIMAÇÃO BACKGROUND ================= */ }
     if (testeRef.current) {
       testeRef.current.position.x = -0.122 + Math.sin(t * 0.7) * 0.03
       testeRef.current.position.y = 6.137 + Math.cos(t * 0.6) * 0.0
@@ -247,9 +246,13 @@ export function CenaCabine() {
                     <span style={{ fontSize: '11px', color: '#00ffa3' }}>TECH_STACK:</span>
                     <div style={{ fontSize: '12px', color: '#aaffff', marginTop: '5px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
                       <span>{">"} REACT / REACT NATIVE</span>
+                      <span>{">"} JAVASCRIPT</span>
                       <span>{">"} TYPESCRIPT</span>
                       <span>{">"} THREE.JS / R3F</span>
                       <span>{">"} STYLED COMPONENTS</span>
+                      <span>{">"} VUE JS</span>
+                      <span>{">"} HTML</span>
+                      <span>{">"} CSS</span>
                     </div>
                   </div>
 
@@ -622,7 +625,6 @@ export function CenaCabine() {
         <mesh geometry={(nodes.globo_estrutura002 as THREE.Mesh).geometry} material={materials['cobre.001']} position={[5.534, 2.937, 1.011]} rotation={[0.244, 0.205, 0.128]} scale={[0.072, 0.087, 0.072]} />
 
         {/* ================= TELA PRINCIPAL ================= */}
-
         <mesh
           ref={telaPrincipalRef}
           geometry={(nodes.tela_principal as THREE.Mesh).geometry}
