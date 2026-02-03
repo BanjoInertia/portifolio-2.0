@@ -1,53 +1,67 @@
 import * as THREE from 'three'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGLTF, useCursor, Html } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { easing } from 'maath'
-import type { GLTF } from 'three-stdlib'
 import portfolioData from '../../assets/portfolio.json'
 
-type GLTFResult = GLTF & {
-  nodes: {
-    [key: string]: THREE.Mesh
-  }
-  materials: {
-    [key: string]: THREE.MeshStandardMaterial
-  }
-}
+type GLTFResult = {
+  nodes: { [key: string]: THREE.Object3D };
+  materials: { [key: string]: THREE.MeshStandardMaterial };
+};
 
 function BlinkingLight({ node, color, speed, offset }: { node: THREE.Mesh, color: string, speed: number, offset: number }) {
-  if (!node) return null
+  const lightRef = useRef<THREE.PointLight>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null!);
 
-  const material = (node.material as THREE.MeshStandardMaterial).clone()
-  const materialRef = useRef(material)
-  const lightRef = useRef<THREE.PointLight>(null)
+  const blinkingMaterial = useMemo(() => {
+    const m = (node.material as THREE.MeshStandardMaterial).clone();
+    m.emissive = new THREE.Color(color);
+    return m;
+  }, [node, color]);
 
   useFrame((state) => {
-    const time = state.clock.elapsedTime
-    const wave = Math.sin(time * speed + offset)
-    const intensity = Math.max(0, wave)
+    const time = state.clock.elapsedTime;
+    const wave = Math.sin(time * speed + offset);
+    const intensity = Math.max(0, wave);
 
     if (materialRef.current) {
-      materialRef.current.emissive = new THREE.Color(color)
-      materialRef.current.emissiveIntensity = intensity * 5
+      materialRef.current.emissiveIntensity = intensity * 5;
     }
     if (lightRef.current) {
-      lightRef.current.intensity = intensity * 4
+      lightRef.current.intensity = intensity * 4;
     }
-  })
+  });
+
+  if (!node) return null;
 
   return (
     <group>
-      <mesh geometry={node.geometry} material={materialRef.current} position={node.position} rotation={node.rotation} scale={node.scale} />
-      <pointLight ref={lightRef} position={node.position} distance={3} color={color} decay={2} />
+      <mesh
+        geometry={node.geometry}
+        position={node.position}
+        rotation={node.rotation}
+        scale={node.scale}
+      >
+        <primitive
+          object={blinkingMaterial}
+          ref={materialRef}
+          attach="material"
+        />
+      </mesh>
+
+      <pointLight
+        ref={lightRef}
+        position={node.position}
+        color={color}
+        distance={3}
+      />
     </group>
-  )
+  );
 }
 
 export function CenaCabine() {
-  const { nodes, materials } = useGLTF('/models/cabine.glb') as any
-
-  console.log("Nodes disponíveis:", Object.keys(nodes));
+  const { nodes, materials } = useGLTF('/models/cabine.glb') as unknown as GLTFResult;
 
   const livro1Ref = useRef<THREE.Group>(null)
   const livro2CapaRef = useRef<THREE.Group>(null)
@@ -87,8 +101,6 @@ export function CenaCabine() {
   const paginaAnterior = () => setPagina((prev) => (prev - 1 + totalPaginas) % totalPaginas)
 
   useEffect(() => {
-    setShowModal(false);
-
     const timer = setTimeout(() => {
       setShowModal(true);
     }, 3000);
@@ -185,7 +197,10 @@ export function CenaCabine() {
     }
   })
 
-  const handleOver = (e: any) => { e.stopPropagation(); setHover(true) }
+  const handleOver = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    setHover(true);
+  };
   const handleOut = () => setHover(false)
 
   if (!nodes) return null
@@ -286,7 +301,7 @@ export function CenaCabine() {
         {nodes.teste && (
           <mesh
             ref={testeRef}
-            geometry={nodes.teste.geometry}
+            geometry={(nodes.teste as THREE.Mesh).geometry}
             position={[-0.122, 6.137, -5.516]}
             rotation={[Math.PI / 2, 0, 0]}
             scale={13.539}
@@ -312,7 +327,7 @@ export function CenaCabine() {
             ref={livro1Ref}
             position={[0, 0, 0]}
             scale={[1, 1, 1]}
-            onClick={(e: any) => {
+            onClick={(e: ThreeEvent<MouseEvent>) => {
               e.stopPropagation();
               setLivro1Aberto(!livro1Aberto);
             }}
@@ -322,10 +337,10 @@ export function CenaCabine() {
         </group>
 
         <group position={[-5.386, 2.526, 2.479]} rotation={[1.915, -0.161, -0.775]} scale={0.708}>
-          <mesh geometry={nodes.livro_1_1.geometry} material={materials.cobre} />
-          <mesh geometry={nodes.livro_1_2.geometry} material={materials['cobre.001']} />
-          <mesh geometry={nodes.livro_1_3.geometry} material={materials.bege} />
-          <mesh geometry={nodes.livro_1_4.geometry} material={materials.amarelo} />
+          <mesh geometry={(nodes.livro_1_1 as THREE.Mesh).geometry} material={materials.cobre} />
+          <mesh geometry={(nodes.livro_1_2 as THREE.Mesh).geometry} material={materials['cobre.001']} />
+          <mesh geometry={(nodes.livro_1_3 as THREE.Mesh).geometry} material={materials.bege} />
+          <mesh geometry={(nodes.livro_1_4 as THREE.Mesh).geometry} material={materials.amarelo} />
         </group>
 
         {/* ================= LIVRO 2 ================= */}
@@ -336,7 +351,10 @@ export function CenaCabine() {
             ref={livro2CapaRef}
             position={[0, 0, 0]}
             scale={[1, 1, 1]}
-            onClick={(e: any) => { e.stopPropagation(); setLivro2Aberto(!livro2Aberto) }}
+            onClick={(e: ThreeEvent<MouseEvent>) => {
+              e.stopPropagation();
+              setLivro2Aberto(!livro2Aberto);
+            }}
             onPointerOver={handleOver}
             onPointerOut={handleOut}
           />
@@ -359,10 +377,10 @@ export function CenaCabine() {
         </group>
 
         <group position={[5.961, 2.111, 3.521]} rotation={[0.466, -0.729, 0.194]} scale={0.148}>
-          <mesh geometry={nodes.livro_2_1.geometry} material={materials.cobre} />
-          <mesh geometry={nodes.livro_2_2.geometry} material={materials['cobre.001']} />
-          <mesh geometry={nodes.livro_2_3.geometry} material={materials.bege} />
-          <mesh geometry={nodes.livro_2_4.geometry} material={materials.amarelo} />
+          <mesh geometry={(nodes.livro_2_1 as THREE.Mesh).geometry} material={materials.cobre} />
+          <mesh geometry={(nodes.livro_2_2 as THREE.Mesh).geometry} material={materials['cobre.001']} />
+          <mesh geometry={(nodes.livro_2_3 as THREE.Mesh).geometry} material={materials.bege} />
+          <mesh geometry={(nodes.livro_2_4 as THREE.Mesh).geometry} material={materials.amarelo} />
         </group>
 
         {/* ================= ARTEFATO ================= */}
@@ -378,21 +396,15 @@ export function CenaCabine() {
               position={[0.1, 0.1, 0.3]}
               scale={[0.1, 0.1, 0.1]}
             >
-              <mesh
-                geometry={nodes.artefato_dourado_ponteiro_1.geometry}
-                material={materials.ouro}
-              />
-              <mesh
-                geometry={nodes.artefato_dourado_ponteiro_2.geometry}
-                material={materials.preto}
-              />
+              <mesh geometry={(nodes.artefato_dourado_ponteiro_1 as THREE.Mesh).geometry} material={materials.ouro} />
+              <mesh geometry={(nodes.artefato_dourado_ponteiro_2 as THREE.Mesh).geometry} material={materials.preto} />
             </primitive>
           )}
         </group>
 
         <group position={[4.098, 3.75, -1.284]} rotation={[1.622, -0.119, 0.564]} scale={[0.522, 0.058, 0.522]}>
-          <mesh geometry={nodes.artefato_dourado_1.geometry} material={materials.ouro} />
-          <mesh geometry={nodes.artefato_dourado_2.geometry} material={materials.madeira} />
+          <mesh geometry={(nodes.artefato_dourado_1 as THREE.Mesh).geometry} material={materials.ouro} />
+          <mesh geometry={(nodes.artefato_dourado_2 as THREE.Mesh).geometry} material={materials.madeira} />
         </group>
 
         {/* ================= ALAVANCA 1 (Esquerda) ================= */}
@@ -403,7 +415,7 @@ export function CenaCabine() {
               ref={alavanca1Ref}
               position={[0, 0, 0]}
               scale={[1, 1, 1]}
-              onClick={(e: any) => {
+              onClick={(e: ThreeEvent<MouseEvent>) => {
                 e.stopPropagation();
                 setAlavanca1Ativa(!alavanca1Ativa);
               }}
@@ -421,7 +433,7 @@ export function CenaCabine() {
               ref={alavanca2Ref}
               position={[0, 0, 0]}
               scale={[1, 1, 1]}
-              onClick={(e: any) => {
+              onClick={(e: ThreeEvent<MouseEvent>) => {
                 e.stopPropagation();
                 setAlavanca2Ativa(!alavanca2Ativa);
               }}
@@ -441,7 +453,7 @@ export function CenaCabine() {
               position={[0.007, -0.008, -0.385]}
               rotation={[-1.535, 1.556, 3.105]}
               scale={0.384}
-              onClick={(e: any) => {
+              onClick={(e: ThreeEvent<MouseEvent>) => {
                 e.stopPropagation()
                 setSetaDirAtiva(true)
                 proximaPagina()
@@ -450,8 +462,8 @@ export function CenaCabine() {
               onPointerOver={handleOver}
               onPointerOut={handleOut}
             >
-              <mesh geometry={nodes.seta_direita_1.geometry} material={materials.cobre} />
-              <mesh geometry={nodes.seta_direita_2.geometry} material={materials.preto} />
+              <mesh geometry={(nodes.seta_direita_1 as THREE.Mesh).geometry} material={materials.cobre} />
+              <mesh geometry={(nodes.seta_direita_2 as THREE.Mesh).geometry} material={materials.preto} />
             </group>
           </group>
         </group>
@@ -466,7 +478,7 @@ export function CenaCabine() {
               position={[-0.011, -0.001, -0.386]}
               rotation={[0.679, 1.131, 0.893]}
               scale={0.384}
-              onClick={(e: any) => {
+              onClick={(e: ThreeEvent<MouseEvent>) => {
                 e.stopPropagation()
                 setSetaEsqAtiva(true)
                 paginaAnterior()
@@ -475,8 +487,8 @@ export function CenaCabine() {
               onPointerOver={handleOver}
               onPointerOut={handleOut}
             >
-              <mesh geometry={nodes.seta_esquerda_1.geometry} material={materials.cobre} />
-              <mesh geometry={nodes.seta_esquerda_2.geometry} material={materials.preto} />
+              <mesh geometry={(nodes.seta_esquerda_1 as THREE.Mesh).geometry} material={materials.cobre} />
+              <mesh geometry={(nodes.seta_esquerda_2 as THREE.Mesh).geometry} material={materials.preto} />
             </group>
           </group>
         </group>
@@ -491,7 +503,7 @@ export function CenaCabine() {
             rotation={[0, 0, 0]}
           >
             <mesh
-              geometry={nodes.medidores002?.geometry}
+              geometry={(nodes.medidores002 as THREE.Mesh).geometry}
               material={materials.preto}
               position={[0, 0.011, -0.122]}
               rotation={[0.093, 0.042, 0.753]}
@@ -509,7 +521,7 @@ export function CenaCabine() {
             scale={[1, 1, 1]}
           >
             <mesh
-              geometry={nodes.medidores003?.geometry}
+              geometry={(nodes.medidores003 as THREE.Mesh).geometry}
               material={materials.preto}
               position={[-0.09, 0.111, -0.091]}
               rotation={[0.087, 0.004, 0.753]}
@@ -519,21 +531,21 @@ export function CenaCabine() {
         </group>
 
         <group position={[-5.386, 2.526, 2.479]} rotation={[1.915, -0.161, -0.775]} scale={0.708}>
-          <mesh geometry={nodes.livro_1_1?.geometry} material={materials.cobre} />
-          <mesh geometry={nodes.livro_1_2?.geometry} material={materials['cobre.001']} />
-          <mesh geometry={nodes.livro_1_3?.geometry} material={materials.bege} />
-          <mesh geometry={nodes.livro_1_4?.geometry} material={materials.amarelo} />
+          <mesh geometry={(nodes.livro_1_1 as THREE.Mesh).geometry} material={materials.cobre} />
+          <mesh geometry={(nodes.livro_1_2 as THREE.Mesh).geometry} material={materials['cobre.001']} />
+          <mesh geometry={(nodes.livro_1_3 as THREE.Mesh).geometry} material={materials.bege} />
+          <mesh geometry={(nodes.livro_1_4 as THREE.Mesh).geometry} material={materials.amarelo} />
         </group>
         <group position={[5.961, 2.111, 3.521]} rotation={[0.466, -0.729, 0.194]} scale={0.148}>
-          <mesh geometry={nodes.livro_2_1?.geometry} material={materials.cobre} />
-          <mesh geometry={nodes.livro_2_2?.geometry} material={materials['cobre.001']} />
-          <mesh geometry={nodes.livro_2_3?.geometry} material={materials.bege} />
-          <mesh geometry={nodes.livro_2_4?.geometry} material={materials.amarelo} />
+          <mesh geometry={(nodes.livro_2_1 as THREE.Mesh).geometry} material={materials.cobre} />
+          <mesh geometry={(nodes.livro_2_2 as THREE.Mesh).geometry} material={materials['cobre.001']} />
+          <mesh geometry={(nodes.livro_2_3 as THREE.Mesh).geometry} material={materials.bege} />
+          <mesh geometry={(nodes.livro_2_4 as THREE.Mesh).geometry} material={materials.amarelo} />
         </group>
 
         <group position={[4.098, 3.75, -1.284]} rotation={[1.622, -0.119, 0.564]} scale={[0.522, 0.058, 0.522]}>
-          <mesh geometry={nodes.artefato_dourado_1?.geometry} material={materials.ouro} />
-          <mesh geometry={nodes.artefato_dourado_2?.geometry} material={materials.madeira} />
+          <mesh geometry={(nodes.artefato_dourado_1 as THREE.Mesh).geometry} material={materials.ouro} />
+          <mesh geometry={(nodes.artefato_dourado_2 as THREE.Mesh).geometry} material={materials.madeira} />
         </group>
 
         {/* ================= GLOBO (Esfera com Pivô) ================= */}
@@ -548,7 +560,7 @@ export function CenaCabine() {
               ref={globoRef}
               position={[0, 0, 0]}
               scale={[1, 1, 1]}
-              onClick={(e: any) => {
+              onClick={(e: ThreeEvent<MouseEvent>) => {
                 e.stopPropagation();
                 setGloboGirando(!globoGirando);
               }}
@@ -559,16 +571,16 @@ export function CenaCabine() {
           )}
         </group>
 
-        <mesh geometry={nodes.globo_estrutura002?.geometry} material={materials['cobre.001']} position={[5.534, 2.937, 1.011]} rotation={[0.244, 0.205, 0.128]} scale={[0.072, 0.087, 0.072]} />
+        <mesh geometry={(nodes.globo_estrutura002 as THREE.Mesh).geometry} material={materials['cobre.001']} position={[5.534, 2.937, 1.011]} rotation={[0.244, 0.205, 0.128]} scale={[0.072, 0.087, 0.072]} />
 
-        <mesh geometry={nodes.esfera_vermelha?.geometry} material={materials.vermelho} position={[3.317, 2.319, 0.869]} rotation={[0.384, -0.445, 0.086]} scale={0.455} />
+        <mesh geometry={(nodes.esfera_vermelha as THREE.Mesh).geometry} material={materials.vermelho} position={[3.317, 2.319, 0.869]} rotation={[0.384, -0.445, 0.086]} scale={0.455} />
 
-        <mesh geometry={nodes.telinha?.geometry} position={[-5.244, 3.176, -0.927]} rotation={[0.139, -0.856, 0.208]} scale={[0.195, 0.195, 0.332]}>
+        <mesh geometry={(nodes.telinha as THREE.Mesh).geometry} position={[-5.244, 3.176, -0.927]} rotation={[0.139, -0.856, 0.208]} scale={[0.195, 0.195, 0.332]}>
           <meshStandardMaterial color="#00ffa3" emissive="#00ffa3" emissiveIntensity={3} toneMapped={false} />
         </mesh>
         <mesh
           ref={telaPrincipalRef}
-          geometry={nodes.tela_principal?.geometry}
+          geometry={(nodes.tela_principal as THREE.Mesh).geometry}
           position={[0, 3.668, -0.839]}
           rotation={[1.142, 0, 0]}
         >
@@ -580,41 +592,41 @@ export function CenaCabine() {
           />
         </mesh>
 
-        <BlinkingLight node={nodes.luz} color="#ff0000" speed={2.5} offset={0} />
-        <BlinkingLight node={nodes.luz001} color="#0000ff" speed={5} offset={15} />
-        <BlinkingLight node={nodes.luz002} color="#00ff00" speed={3} offset={5} />
-        <BlinkingLight node={nodes.luz003} color="#00ff00" speed={4} offset={2} />
-        <BlinkingLight node={nodes.luz004} color="#00ff00" speed={5} offset={0} />
-        <BlinkingLight node={nodes.luz005} color="#00ff00" speed={7} offset={2} />
-        <BlinkingLight node={nodes.luz006} color="#ffff00" speed={3} offset={5} />
-        <BlinkingLight node={nodes.luz007} color="#ffff00" speed={4} offset={1} />
-        <BlinkingLight node={nodes.luz008} color="#ff0000" speed={2} offset={10} />
+        <BlinkingLight node={nodes.luz as THREE.Mesh} color="#ff0000" speed={2.5} offset={0} />
+        <BlinkingLight node={nodes.luz001 as THREE.Mesh} color="#0000ff" speed={5} offset={15} />
+        <BlinkingLight node={nodes.luz002 as THREE.Mesh} color="#00ff00" speed={3} offset={5} />
+        <BlinkingLight node={nodes.luz003 as THREE.Mesh} color="#00ff00" speed={4} offset={2} />
+        <BlinkingLight node={nodes.luz004 as THREE.Mesh} color="#00ff00" speed={5} offset={0} />
+        <BlinkingLight node={nodes.luz005 as THREE.Mesh} color="#00ff00" speed={7} offset={2} />
+        <BlinkingLight node={nodes.luz006 as THREE.Mesh} color="#ffff00" speed={3} offset={5} />
+        <BlinkingLight node={nodes.luz007 as THREE.Mesh} color="#ffff00" speed={4} offset={1} />
+        <BlinkingLight node={nodes.luz008 as THREE.Mesh} color="#ff0000" speed={2} offset={10} />
 
         <group position={[-6.249, 3.891, -0.252]} rotation={[1.882, 0.465, -0.789]} scale={0.679}>
-          <mesh geometry={nodes.cena_1?.geometry} material={materials.metal} />
-          <mesh geometry={nodes.cena_2?.geometry} material={materials.bege} />
-          <mesh geometry={nodes.cena_3?.geometry} material={materials.amarelo} />
-          <mesh geometry={nodes.cena_4?.geometry} material={materials.vermelho} />
-          <mesh geometry={nodes.cena_5?.geometry} material={materials.verde} />
-          <mesh geometry={nodes.cena_6?.geometry} material={materials.ciano} />
-          <mesh geometry={nodes.cena_7?.geometry} material={materials.cabo_1} />
-          <mesh geometry={nodes.cena_8?.geometry} material={materials.preto} />
-          <mesh geometry={nodes.cena_9?.geometry} material={materials.madeira} />
-          <mesh geometry={nodes.cena_10?.geometry} material={materials.metal_2} />
-          <mesh geometry={nodes.cena_11?.geometry} material={materials.cabo_2} />
+          <mesh geometry={(nodes.cena_1 as THREE.Mesh).geometry} material={materials.metal} />
+          <mesh geometry={(nodes.cena_2 as THREE.Mesh).geometry} material={materials.bege} />
+          <mesh geometry={(nodes.cena_3 as THREE.Mesh).geometry} material={materials.amarelo} />
+          <mesh geometry={(nodes.cena_4 as THREE.Mesh).geometry} material={materials.vermelho} />
+          <mesh geometry={(nodes.cena_5 as THREE.Mesh).geometry} material={materials.verde} />
+          <mesh geometry={(nodes.cena_6 as THREE.Mesh).geometry} material={materials.ciano} />
+          <mesh geometry={(nodes.cena_7 as THREE.Mesh).geometry} material={materials.cabo_1} />
+          <mesh geometry={(nodes.cena_8 as THREE.Mesh).geometry} material={materials.preto} />
+          <mesh geometry={(nodes.cena_9 as THREE.Mesh).geometry} material={materials.madeira} />
+          <mesh geometry={(nodes.cena_10 as THREE.Mesh).geometry} material={materials.metal_2} />
+          <mesh geometry={(nodes.cena_11 as THREE.Mesh).geometry} material={materials.cabo_2} />
         </group>
 
-        <mesh geometry={nodes.mesh?.geometry} material={materials.preto} />
+        <mesh geometry={(nodes.mesh as THREE.Mesh).geometry} material={materials.preto} />
 
-        <mesh geometry={nodes.lampiao?.geometry} material={materials.lampiao} position={[-3.987, 6.423, -1.352]} rotation={[0, 0.299, 0]} scale={0.431} />
-        <mesh geometry={nodes.luz_lampiao?.geometry} material={materials['lampiao-vidro']} position={[-3.987, 7.238, -1.352]} rotation={[0, 0.299, 0]} scale={0.385}>
+        <mesh geometry={(nodes.lampiao as THREE.Mesh).geometry} material={materials.lampiao} position={[-3.987, 6.423, -1.352]} rotation={[0, 0.299, 0]} scale={0.431} />
+        <mesh geometry={(nodes.luz_lampiao as THREE.Mesh).geometry} material={materials['lampiao-vidro']} position={[-3.987, 7.238, -1.352]} rotation={[0, 0.299, 0]} scale={0.385}>
           <meshStandardMaterial color="#ffaa00" emissive="#ffaa00" emissiveIntensity={3} toneMapped={false} />
         </mesh>
 
         <pointLight position={[-2, 7.2, 4]} intensity={200} distance={50} color="#ffaa00" castShadow shadow-bias={-0.0005} shadow-mapSize={[2048, 2048]} />
-        <mesh geometry={nodes.arvores.geometry} material={materials.preto} position={[-15.311, 6.216, -5.168]} rotation={[Math.PI / 2, -1.357, 0]} scale={0.923} />
-        <mesh geometry={nodes.arvores001.geometry} material={materials.preto} position={[-18.697, 2.863, -5.168]} rotation={[Math.PI / 2, -1.357, 0]} scale={0.923} />
-        <mesh geometry={nodes.arvores002.geometry} material={materials.preto} position={[-16.886, 3.439, -5.168]} rotation={[Math.PI / 2, -1.242, 0]} scale={0.923} />
+        <mesh geometry={(nodes.arvores as THREE.Mesh).geometry} material={materials.preto} position={[-15.311, 6.216, -5.168]} rotation={[Math.PI / 2, -1.357, 0]} scale={0.923} />
+        <mesh geometry={(nodes.arvores001 as THREE.Mesh).geometry} material={materials.preto} position={[-18.697, 2.863, -5.168]} rotation={[Math.PI / 2, -1.357, 0]} scale={0.923} />
+        <mesh geometry={(nodes.arvores002 as THREE.Mesh).geometry} material={materials.preto} position={[-16.886, 3.439, -5.168]} rotation={[Math.PI / 2, -1.242, 0]} scale={0.923} />
       </group>
     </>
   )
