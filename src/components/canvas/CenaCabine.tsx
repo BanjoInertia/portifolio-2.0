@@ -283,8 +283,9 @@ export function CenaCabine() {
                   <div style={dividerStyle} />
 
                   <p style={descStyle}>
-                    Desenvolvedor Front focado em criar interfaces imersivas e performantes.
-                    Misturo design e código para transformar ideias em experiências digitais únicas.
+                    Olá meu nome é Marcelo Henrique, sou um desenvolvedor Front-end dedicado a criar interfaces funcionais e dinâmicas. Utilizo React e TypeScript como base, Utilizo tecnologias como Three.js para construir experiências web que sejam visualmente mais interessantes e envolventes.
+                    <br />
+                    Estou focado em evoluir tecnicamente a cada dia e procuro minha primeira oportunidade para contribuir com soluções reais e continuar aprendendo na prática.
                   </p>
 
                   <a
