@@ -91,6 +91,9 @@ export function CenaCabine() {
   const [btnHovered, setBtnHovered] = useState(false)
   const [hovered, setHover] = useState(false)
 
+  const [interagiuComSetas, setInteragiuComSetas] = useState(false);
+  const [showLabels, setShowLabels] = useState(false);
+
   const [pagina, setPagina] = useState(0)
 
   const totalPaginas = portfolioData.length + 2
@@ -103,6 +106,7 @@ export function CenaCabine() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowModal(true);
+      setShowLabels(true);
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -188,7 +192,6 @@ export function CenaCabine() {
     {/* ================= ANIMAÇÃO TELA PRINCIPAL ================= */ }
     if (telaPrincipalRef.current) {
       const material = telaPrincipalRef.current.material as THREE.MeshStandardMaterial
-
       const targetIntensity = showModal ? 0.8 : 0
       const targetColor = showModal ? new THREE.Color("#00aaff") : new THREE.Color("#000510")
 
@@ -522,6 +525,7 @@ export function CenaCabine() {
               scale={0.384}
               onClick={(e: ThreeEvent<MouseEvent>) => {
                 e.stopPropagation()
+                setInteragiuComSetas(true);
                 setSetaDirAtiva(true)
                 proximaPagina()
                 setTimeout(() => setSetaDirAtiva(false), 150)
@@ -531,11 +535,23 @@ export function CenaCabine() {
             >
               <mesh geometry={(nodes.seta_direita_1 as THREE.Mesh).geometry} material={materials.cobre} />
               <mesh geometry={(nodes.seta_direita_2 as THREE.Mesh).geometry} material={materials.preto} />
+
+              {!interagiuComSetas && (
+                <Html center distanceFactor={10}>
+                  <div style={{
+                    ...helperLabelStyle,
+                    opacity: showLabels ? 1 : 0
+                  }}>
+                    [ AVANÇAR ]
+                  </div>
+                </Html>
+              )}
             </group>
           </group>
         </group>
 
         {/* ================= SETA ESQUERDA ================= */}
+
         <group
           position={[-2.196, 2.988, -0.317]}
           rotation={[-0.673, 0.17, 0.14]}
@@ -547,6 +563,7 @@ export function CenaCabine() {
               scale={0.384}
               onClick={(e: ThreeEvent<MouseEvent>) => {
                 e.stopPropagation()
+                setInteragiuComSetas(true)
                 setSetaEsqAtiva(true)
                 paginaAnterior()
                 setTimeout(() => setSetaEsqAtiva(false), 150)
@@ -556,6 +573,17 @@ export function CenaCabine() {
             >
               <mesh geometry={(nodes.seta_esquerda_1 as THREE.Mesh).geometry} material={materials.cobre} />
               <mesh geometry={(nodes.seta_esquerda_2 as THREE.Mesh).geometry} material={materials.preto} />
+
+              {!interagiuComSetas && (
+                <Html center distanceFactor={10}>
+                  <div style={{
+                    ...helperLabelStyle,
+                    opacity: showLabels ? 1 : 0
+                  }}>
+                    [ VOLTAR ]
+                  </div>
+                </Html>
+              )}
             </group>
           </group>
         </group>
@@ -750,5 +778,23 @@ const actionButtonStyle: React.CSSProperties = {
   transition: 'all 0.3s ease-in-out',
   textTransform: 'uppercase'
 }
+
+const helperLabelStyle: React.CSSProperties = {
+  background: 'rgba(0, 255, 163, 0.15)',
+  backdropFilter: 'blur(2px)',
+  border: '1px solid #00ffa3',
+  color: '#00ffa3',
+  padding: '4px 10px',
+  fontSize: '11px',
+  fontFamily: '"Courier New", monospace',
+  whiteSpace: 'nowrap',
+  pointerEvents: 'none',
+  textShadow: '0 0 5px #00ffa3',
+  boxShadow: '0 0 15px rgba(0, 255, 163, 0.3)',
+  borderRadius: '2px',
+  transition: 'opacity 1s ease-in-out',
+  animation: 'pulseLabel 2s infinite ease-in-out',
+  transform: 'translateY(40px)',
+};
 
 useGLTF.preload('/models/cabine.glb')
