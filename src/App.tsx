@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import { CenaPorta } from './components/canvas/CenaPorta'
-import { CenaCabine } from './components/canvas/CenaCabine'
+
+const CenaCabine = lazy(() =>
+  import('./components/canvas/CenaCabine').then((m) => ({ default: m.CenaCabine }))
+)
 
 export default function App() {
   const [currentScene, setCurrentScene] = useState<'porta' | 'cabine'>('porta')
@@ -10,6 +14,7 @@ export default function App() {
 
   useEffect(() => {
     if (fadeToBlack && currentScene === 'porta') {
+      useGLTF.preload('/models/cabine.glb')
 
       const timerTexto = setTimeout(() => {
         setShowText(true)
@@ -35,13 +40,20 @@ export default function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', backgroundColor: '#101010' }}>
 
-      <Canvas shadows camera={{ position: [0, 5, 50], fov: 10 }}>
+      <Canvas
+        shadows
+        camera={{ position: [0, 5, 50], fov: 10 }}
+        dpr={[1, 1.5]}
+        gl={{ powerPreference: 'high-performance' }}
+      >
         <ambientLight intensity={0.05} />
 
         {currentScene === 'porta' ? (
           <CenaPorta onEnter={setFadeToBlack} />
         ) : (
-          <CenaCabine />
+          <Suspense fallback={null}>
+            <CenaCabine />
+          </Suspense>
         )}
       </Canvas>
 

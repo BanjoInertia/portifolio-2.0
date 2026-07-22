@@ -152,7 +152,6 @@ export function CenaPorta({ onEnter }: { onEnter: (s: boolean) => void }) {
   return (
     <group dispose={null}>
 
-      {/* ================= AVISO DE PERFORMANCE ================= */}
       <Html fullscreen>
         <div style={{
           position: 'absolute',

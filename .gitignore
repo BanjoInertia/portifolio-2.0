@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# backups locais de modelos 3D (não versionar)
+public/models/_originais_backup/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
